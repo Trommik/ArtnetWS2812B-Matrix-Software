@@ -17,5 +17,9 @@
   <ItemGroup>
     <None Include="ArtnetWS2812B.ino" />
   </ItemGroup>
- 
+  <ItemGroup>
+    <ClInclude Include="__vm\.ArtnetWS2812B.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -5,6 +5,14 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArtnetWS2812B", "ArtnetWS2812B.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WiFiUdp", "..\..\Arduino\libraries\WiFiUdp\WiFiUdp.vcxitems", "{4D35D74A-9C76-40C9-B028-336CA195139A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP8266WiFi", "..\..\Arduino\libraries\ESP8266WiFi\ESP8266WiFi.vcxitems", "{7B21D510-E92B-4BFC-841F-BB5D179A4881}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArtnetWifi", "..\..\Arduino\libraries\ArtnetWifi\ArtnetWifi.vcxitems", "{50EA58A3-B266-45E0-9053-F06C84581A32}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_NeoPixel", "..\..\Arduino\libraries\Adafruit_NeoPixel\Adafruit_NeoPixel.vcxitems", "{51AAC997-2E33-4799-B05D-7D0197FE913A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
