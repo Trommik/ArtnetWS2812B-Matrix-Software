@@ -86,7 +86,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\MatrixPong\Paddel.h" />
+    <ClInclude Include="..\MatrixPong\PongGame.h" />
+    <ClInclude Include="..\MatrixPong\Puck.h" />
+    <ClInclude Include="..\MatrixPong\Vector.h" />
     <ClInclude Include="__vm\.ArtnetWS2812B.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\MatrixPong\Paddel.cpp" />
+    <ClCompile Include="..\MatrixPong\PongGame.cpp" />
+    <ClCompile Include="..\MatrixPong\Puck.cpp" />
+    <ClCompile Include="..\MatrixPong\Vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
