@@ -17,6 +17,10 @@
 #include "Paddel.h"
 
 
+//Game settings
+unsigned long previousMillis = 0;
+
+
 //Led settings
 #define NUM_LEDS 290
 #define DATA_PIN 14
@@ -44,10 +48,26 @@ bool sendFrame = 1;
 int previousDataLength = 0;
 
 
-//Wifi settings
-const char* ssid = "Speedport Schwark 2,4 GHz";
-const char* password = "4858035152347806";
+//Controller settings 
+struct Controller{
+	int axisC, btnsC; // axis Count / btns Count
+	double *axis; // axes values
+	boolean *btns; // btn values
+}cont_a, cont_b;
 
+boolean gotA = false;
+boolean gotB = false;
+
+boolean init_Cont_A = false;
+boolean init_Cont_B = false;
+
+
+//Wifi settings
+//const char* ssid = "Speedport Schwark 2,4 GHz";
+//const char* password = "4858035152347806";
+
+const char* ssid = "Netgear Schwark";
+const char* password = "";
 
 //Create objects
 ArtnetWifi artnet; // Initialize the artnet libary
@@ -97,6 +117,17 @@ boolean ConnectWifi(void) {
 }
 
 
+// Helper function
+float mapFloat(float s, float a1, float a2, float b1, float b2)
+{
+	return b1 + (s - a1)*(b2 - b1) / (a2 - a1);
+}
+
+double mapDouble(double s, int a1, int a2, double b1, double b2) {
+	return (a2 - a1) * (s - b1) / (b2 - b1) + a1;
+}
+
+
 //different ArtNet callbacks
 void printDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)
 {
@@ -128,7 +159,8 @@ void printDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t
 
 void onInpFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)
 {
-	/*Serial.print("DMX: Univ: ");
+	/*
+	Serial.print("DMX: Univ: ");
 	Serial.print(universe, DEC);
 	Serial.print(", Seq: ");
 	Serial.print(sequence, DEC);
@@ -138,40 +170,147 @@ void onInpFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* d
 	Serial.print(data[1], DEC);
 	Serial.print(", Data (");
 	Serial.print(length-2, DEC);
-	Serial.print("): ");
-
-	// send out the buffer
-	for (int i = 2; i < length; i++)
-	{
-		Serial.print(data[i], HEX);
-		Serial.print(" ");
-	}
-	Serial.println();*/
+	Serial.print("): "); 
+	*/
 
 	int axes = data[0];
 	int btns = data[1];
 
-	double *axisVal;                //Declare pointer to type of array
-	axisVal = new double[axes];   //use 'new' to create array of size x
-	
-	for (int a = 0; a < axes; a++){
-		union { char buf[sizeof(double)]; double _axisVal; };
+	if (universe == 0){ // cont A
+		cont_a.axisC = axes;
+		cont_a.btnsC = btns;
 
-
-		for (int i = 0; i < sizeof(double); i++) // 8times
-		{
-			buf[i] = data[(a*sizeof(double)) + i + 2];
+		if (!init_Cont_A) { // only alloc memory 1 time
+			cont_a.axis = new double[axes];
+			cont_a.btns = new boolean[btns];
+			init_Cont_A = true;
 		}
 
-		Serial.print("Axis ");
-		Serial.print(a);
-		Serial.print(": ");
-		Serial.print(_axisVal);
-		Serial.println();
-		axisVal[a] = _axisVal;
+		for (int a = 0; a < axes; a++) { // get all axes
+			union { char buf[sizeof(double)]; double _axisVal; };
+
+			for (int i = 0; i < sizeof(double); i++){ // 8 times // 8 bytes is 1 double
+				buf[i] = data[(a * sizeof(double)) + i + 2];
+			}
+			cont_a.axis[a] = _axisVal; 
+		}
+
+		int i = 0;
+		for (int b = axes * 8 + 2; b < length; b++){ // get all buttons
+			cont_a.btns[i] = data[b];
+			i++;
+		}
+
+		//MOVE 
+
+		if (mode == PONG_MODE){
+			float Ly = mapFloat(cont_a.axis[7], -1.0, 1.0, 1, 16 - leftPlayer.getHeight());
+			leftPlayer.move(int(Ly));
+
+			pongGame.removePaddel(LEFT_SIDE);
+			for (int off = 0; off < leftPlayer.getHeight(); off++) {
+				pongGame.set(leftPlayer.render(off));
+			}
+		}
+
+		/*if (cont_a.btns[0] == 1) {
+			leftPlayer.moveUp();
+		}
+		else if (cont_a.btns[2] == 1) {
+			leftPlayer.moveDown();
+		}*/
+
+		//END MOVE
+
+		gotA = true;
+
+	}else if (universe == 1){ // cont B
+		cont_b.axisC = axes;
+		cont_b.btnsC = btns;
+
+		if(!init_Cont_B){ // only alloc memory 1 time
+			cont_b.axis = new double[axes];
+			cont_b.btns = new boolean[btns];
+			init_Cont_B = true;
+		}
+
+		for (int a = 0; a < axes; a++){ // get all axes
+			union { char buf[sizeof(double)]; double _axisVal; };
+
+			for (int i = 0; i < sizeof(double); i++){ // 8 times // 8 bytes is 1 double
+				buf[i] = data[(a * sizeof(double)) + i + 2];
+			}
+
+			cont_b.axis[a] = _axisVal;
+		}
+
+		int i = 0;
+		for (int b = axes * 8 + 2; b < length; b++){ // get all buttons
+			cont_b.btns[i] = data[b];
+			i++;
+		}
+
+		//MOVE
+
+		if (mode == PONG_MODE) {
+			float Ry = mapFloat(cont_b.axis[7], -1.0, 1.0, 1, 16 - rightPlayer.getHeight());
+			rightPlayer.move(int(Ry));
+
+			pongGame.removePaddel(RIGHT_SIDE);
+			for (int off = 0; off < rightPlayer.getHeight(); off++) {
+				pongGame.set(rightPlayer.render(off));
+			}
+		}
+
+		/*if (cont_b.btns[0] == 1) {
+			rightPlayer.moveUp();
+		}else if (cont_b.btns[2] == 1) {
+			rightPlayer.moveDown();
+		}*/
+
+		//END MOVE
+
+		gotB = true;
+
 	}
 
-	delete[] axisVal;       //remeber to free memeory when finished.
+	/*
+	if (universe == 0){
+		Serial.print("Controller A: ");
+		for(int i = 0; i < cont_a.axisC; i++){
+			Serial.print("A");
+			Serial.print(i);
+			Serial.print(": ");
+			Serial.print(cont_a.axis[i]);
+			Serial.print(", ");
+		}
+		for (int i = 0; i < cont_a.btnsC; i++) {
+			Serial.print("B");
+			Serial.print(i);
+			Serial.print(": ");
+			Serial.print(cont_a.btns[i]);
+			Serial.print(", ");
+		}
+		Serial.println();
+	}else{
+		Serial.print("Controller B: ");
+		for (int i = 0; i < cont_b.axisC; i++) {
+			Serial.print("A");
+			Serial.print(i);
+			Serial.print(": ");
+			Serial.print(cont_b.axis[i]);
+			Serial.print(", ");
+		}
+		for (int i = 0; i < cont_b.btnsC; i++) {
+			Serial.print("B");
+			Serial.print(i);
+			Serial.print(": ");
+			Serial.print(cont_b.btns[i]);
+			Serial.print(", ");
+		}
+		Serial.println();
+	}
+	*/
 }
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)
@@ -279,16 +418,12 @@ void initMode()
 }
 
 
-//Pong move player
-void paddelsMove(){}
-
-
 //Render led Strip for the games
 void renderStrip()
 {
 	for (int y = 0; y < HEIGHT; y++) {
 		for (int x = 0; x < WIDTH; x++) {
-			color c = pong.getColor(x, y);
+			color c = pongGame.getColor(x, y);
 
 			int index;
 			if (y % 2) {
@@ -298,11 +433,13 @@ void renderStrip()
 				index = y * HEIGHT + x;
 			}
 
-			strip.setPixelColor(index, strip.Color(c.r, c.g, c.b));
+			strip.setPixelColor(index + 1, strip.Color(c.r, c.g, c.b));
 		}
 	}
 	strip.show();
-	pong.reset();
+
+	pongGame.renderNeeded = false;
+	//pongGame.reset();
 }
 
 
@@ -326,30 +463,26 @@ void setup()
 void loop()
 {
 	artnet.read(); // Read artnet
+
 	if (mode == SNAKE_MODE){
 
 	}else if (mode == PONG_MODE){
-		paddelsMove();
+		unsigned long currentMillis = millis();
 
-		puck.update();
+		if (currentMillis - previousMillis >= 100) { // move puck all 100 ms
+			
+			previousMillis = currentMillis; // save the last time you moved the puck
 
-		for (int off = 0; off < leftPlayer.getHeight(); off++) {
-			pong.set(leftPlayer.render(off));
+			puck.update();
+
+			pongGame.set(puck.render()); // render Puck
+			pongGame.set(puck.renderLast()); // render last Puck 
+			pongGame.set(puck.renderLastLast()); // render lastlast Puck 
 		}
-		for (int off = 0; off < rightPlayer.getHeight(); off++) {
-			pong.set(rightPlayer.render(off));
-		}
 
-		pong.setScore(scoreRight, RIGHT_SIDE); // right side = top side
-		pong.setScore(scoreLeft, LEFT_SIDE); // left side = bottom side
-
-
-		pong.set(puck.render()); // render Puck
-		pong.set(puck.renderLast()); // render last Puck 
-		pong.set(puck.renderLastLast()); // render lastlast Puck 
-
-		renderStrip();
-
-		delay(100);
+		if (pongGame.renderNeeded)
+			renderStrip();
 	}
+
+	yield(); // Do background stuff
 }
