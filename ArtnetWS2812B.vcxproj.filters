@@ -33,19 +33,25 @@
     <ClInclude Include="..\MatrixPong\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SnakeGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MatrixPong\Paddel.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MatrixPong\PongGame.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MatrixPong\Puck.cpp">
-      <Filter>Resource Files</Filter>
+    <ClCompile Include="SnakeGame.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MatrixPong\Vector.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MatrixPong\Puck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MatrixPong\PongGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MatrixPong\Paddel.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

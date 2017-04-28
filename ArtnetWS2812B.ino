@@ -6,6 +6,7 @@
 
 
 //Includes
+#include "SnakeGame.h"
 #include "Adafruit_NeoPixel.h" // Neopixel Libary for WS2812B 
 
 #include "ESP8266WiFi.h" // ESP8266 Core Functions

@@ -90,6 +90,7 @@
     <ClInclude Include="..\MatrixPong\PongGame.h" />
     <ClInclude Include="..\MatrixPong\Puck.h" />
     <ClInclude Include="..\MatrixPong\Vector.h" />
+    <ClInclude Include="SnakeGame.h" />
     <ClInclude Include="__vm\.ArtnetWS2812B.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +98,7 @@
     <ClCompile Include="..\MatrixPong\PongGame.cpp" />
     <ClCompile Include="..\MatrixPong\Puck.cpp" />
     <ClCompile Include="..\MatrixPong\Vector.cpp" />
+    <ClCompile Include="SnakeGame.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
