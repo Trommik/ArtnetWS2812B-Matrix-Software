@@ -13,8 +13,6 @@
 	#include "Vector.h"
 #endif
 
-
-
 #define WIDTH 17 // width in leds of Matrix 
 #define HEIGHT 17 // height in leds of Matrix
 

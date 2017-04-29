@@ -17,6 +17,8 @@
 #include "Puck.h"
 #include "Paddel.h"
 
+//Game Includes Snake
+#include "SnakeGame.h"
 
 //Game settings
 unsigned long previousMillis = 0;
