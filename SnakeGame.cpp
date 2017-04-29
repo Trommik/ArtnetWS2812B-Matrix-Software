@@ -82,12 +82,31 @@ void SnakeGame::init()
 void SnakeGame::placeApple(Vector *p)
 {
 	if (pos.x > 0 && pos.y > 0 && pos.x <= WIDTH && pos.y <= HEIGHT) {
-		Playfield[x][y] = APPLE;
-		ApplePosX = x;
-		ApplePosY = y;
-		AppleMoveCountDown = random(APPLE_COUNTDOWN_STEPS_MIN, APPLE_COUNTDOWN_STEPS_MAX);
+		nextApple = random(APPLE_COUNTDOWN_STEPS_MIN, APPLE_COUNTDOWN_STEPS_MAX); // ###TODO### Check that the apple is not in the snake 
+	}
+}
 
-		AppleCount++;
+void SnakeGame::update()
+{
+	type[pos.x][pos.y] = APPLE;
+
+	edges();
+
+	if (dir == UP) pos.y -= 1;
+	else if (dir == DOWN) pos.y += 1;
+	else if (dir == LEFT) pos.x -= 1;
+	else if (dir == RIGHT) pos.x += 1;
+
+}
+
+boolean SnakeGame::edges()
+{
+	if (pos.y < 0 || pos.y > HEIGHT - 1) { // top or bottom side of window
+		// ###TODO### GameOver!!!
+		return false;
+	}else if (pso.x < 0 || pos.x > WIDTH -1){
+		// ###TODO### GameOver!!!
+
 	}
 }
 
