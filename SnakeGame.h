@@ -7,21 +7,23 @@
 	#include "arduino.h"
 	#include "PongGame.h"
 	#include "Vector.h"
+	#include "deque"
 #else
 	#include "WProgram.h"
 	#include "PongGame.h"
 	#include "Vector.h"
+	#include "deque"
 #endif
 
 #define WIDTH 17 // width in leds of Matrix 
 #define HEIGHT 17 // height in leds of Matrix
 
 #define BLANK 0
-#define SNAKE 1
+#define SNAKE_BODY 1
 #define APPLE 2
 #define SCORE 3
-#define HEAD 4
-#define END 5
+#define SNAKE_HEAD 4
+#define SNAKE_END 5
 
 #define UP 1
 #define DOWN 2
@@ -35,33 +37,41 @@ extern color snakeCol;
 extern color appleCol;
 extern color scoreCol;
 
-extern uint8_t score;
-
 class SnakeGame
 {
  public:
 
 	 uint8_t dir;
-	 Vector pos;
 	 uint8_t length;
 
+	 Vector pos;
+	 Vector applePos;
+	 
 	 boolean renderNeeded = true;
 
-	 void set(renderData Data);
-	 void setScore(uint8_t score);
 
 	 void init();
 	 void update();
-	 void placeApple(Vector *p);
+	 void setDir(uint8_t d);
+	 void render();
+	 void gameOver();
 
 	 color getColor(int x, int y);
 
  private:
 	 uint8_t nextApple;
-
 	 uint8_t type[WIDTH][HEIGHT];
 
-	 boolean edges();
+	 std::deque<Vector> snake; // array pointer to store x,y off snake items
+
+	 Vector placeApple();
+
+	 void eat();
+	 void edges();
+	 void selfCollision();
+	 void delPoint(Vector *p);
+	 void snakeAdd(uint8_t n);
+	 void reset();
 
 };
 

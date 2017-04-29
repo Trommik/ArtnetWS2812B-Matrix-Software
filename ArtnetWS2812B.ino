@@ -66,11 +66,11 @@ boolean init_Cont_B = false;
 
 
 //Wifi settings
-//const char* ssid = "Speedport Schwark 2,4 GHz";
-//const char* password = "4858035152347806";
+const char* ssid = "Speedport Schwark 2,4 GHz";
+const char* password = "4858035152347806";
 
-const char* ssid = "Netgear Schwark";
-const char* password = "";
+//const char* ssid = "Netgear Schwark";
+//const char* password = "";
 
 //Create objects
 ArtnetWifi artnet; // Initialize the artnet libary
@@ -214,6 +214,15 @@ void onInpFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* d
 			for (int off = 0; off < leftPlayer.getHeight(); off++) {
 				pongGame.set(leftPlayer.render(off));
 			}
+		}else if (mode == SNAKE_MODE){
+			if (cont_a.btns[3] == 1)
+				snakeGame.setDir(UP);
+			if (cont_a.btns[1] == 1)
+				snakeGame.setDir(DOWN);
+			if (cont_a.btns[0] == 1)
+				snakeGame.setDir(LEFT);
+			if (cont_a.btns[2] == 1)
+				snakeGame.setDir(RIGHT);
 		}
 
 		/*if (cont_a.btns[0] == 1) {
@@ -391,6 +400,8 @@ void initMode()
 		strip.setPixelColor(0, strip.Color(0, 255, 255)); // set buffer pixel to green for OK WiFi connection
 		artnet.setArtInpCallback(onInpFrame);
 		strip.show();
+
+		snakeGame.init();
 		//SNAKE MODE
 		break;
 	case PONG_MODE:
@@ -426,7 +437,13 @@ void renderStrip()
 {
 	for (int y = 0; y < HEIGHT; y++) {
 		for (int x = 0; x < WIDTH; x++) {
-			color c = pongGame.getColor(x, y);
+
+			color c = {0,0,0};
+
+			if (mode == PONG_MODE)
+				c = pongGame.getColor(x, y);
+			if (mode == SNAKE_MODE)
+				c = snakeGame.getColor(x, y);
 
 			int index;
 			if (y % 2) {
@@ -442,7 +459,7 @@ void renderStrip()
 	strip.show();
 
 	pongGame.renderNeeded = false;
-	//pongGame.reset();
+	snakeGame.renderNeeded = false;
 }
 
 
@@ -469,6 +486,20 @@ void loop()
 
 	if (mode == SNAKE_MODE){
 
+		unsigned long currentMillis = millis();
+
+		if (currentMillis - previousMillis >= 300 - snakeGame.length * 3) { // move puck all 100 ms
+
+			previousMillis = currentMillis; // save the last time you moved the puck
+
+			snakeGame.update();
+
+			snakeGame.render(); // render Snake and apple
+		}
+
+		if (snakeGame.renderNeeded) // render strip if it is needed
+			renderStrip();
+
 	}else if (mode == PONG_MODE){
 		unsigned long currentMillis = millis();
 
@@ -483,7 +514,7 @@ void loop()
 			pongGame.set(puck.renderLastLast()); // render lastlast Puck 
 		}
 
-		if (pongGame.renderNeeded)
+		if (pongGame.renderNeeded) // render strip if it is needed
 			renderStrip();
 	}
 
