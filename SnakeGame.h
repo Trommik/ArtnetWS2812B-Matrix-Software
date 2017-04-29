@@ -61,7 +61,7 @@ class SnakeGame
 
 	 uint8_t type[WIDTH][HEIGHT];
 
-	 void edges();
+	 boolean edges();
 
 };
 

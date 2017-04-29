@@ -88,7 +88,7 @@ void SnakeGame::placeApple(Vector *p)
 
 void SnakeGame::update()
 {
-	type[pos.x][pos.y] = APPLE;
+	//type[pos.x][pos.y] = int(APPLE);
 
 	edges();
 
@@ -104,7 +104,7 @@ boolean SnakeGame::edges()
 	if (pos.y < 0 || pos.y > HEIGHT - 1) { // top or bottom side of window
 		// ###TODO### GameOver!!!
 		return false;
-	}else if (pso.x < 0 || pos.x > WIDTH -1){
+	}else if (pos.x < 0 || pos.x > WIDTH -1){
 		// ###TODO### GameOver!!!
 
 	}
